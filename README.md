@@ -93,7 +93,7 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 - 弹窗是 Windows 消息框，`detached` 启动，不会挡住自检进程退出。
 
 `tests/selfcheck-alert.test.mjs` 6 项盯着这几条规则：通过不弹、失败必记、抛异常也留档、日志轮转、摘要只列失败项。
-- 备份：`../鲸鲸桥接备份/pre-development-20261113-145501-48bb6f90/backup-manifest.json`（37 文件，SHA-256 校验）。
+- 备份建议：动 profile 之前，把该 profile 的 `package.json`、`cordis.patch.yml` 连同 `node_modules` 里的链接清单一起复制一份，出问题整目录还原即可。
 
 ## 还没做到的（别当成已完成）
 
