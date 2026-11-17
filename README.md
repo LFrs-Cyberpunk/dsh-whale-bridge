@@ -4,6 +4,15 @@
 
 **一句话现状：微信私聊 → 鲸鲸 → 本插件 → 一个隔离的 DSH 宿主 → 真实大模型 → 回复回到微信，全链路已跑通。人格可以跟随 DSH（自动读取你 DSH 里的人格，不依赖具体用了哪个插件）。**
 
+## 功能简介
+
+- 能把微信消息转给本机正在运行的 DSH，用 DSH 的回复代替鲸鲸自己的模型。
+- 能选择使用 DSH 中已经培养好的人格、鲸鲸内配置的人格、自己写一张人格卡。
+- 能整理私聊或群聊会话中的喜好记忆来丰富自己的人格，其它人格生长功能待后续开放。
+- DSH 里装的插件会被继承，所以 DSH 能调用已有插件以帮助更好地回复微信消息。
+- 能自动收集所有聊天产生的文本信息作为语料学习，为后期聊天能力的自我训练功能的开放做铺垫。
+- 目前只有私聊功能自动使用 DSH 进行回复，群聊功能尚未开放，群聊会自动使用鲸鲸的 API 进行回复。
+
 ## 安装
 
 本插件跑在 **DSH 桌面端 / dsh web** 上，Windows 环境，需要 Node ≥22。
@@ -51,7 +60,7 @@ xcopy /E /I dsh-whale-bridge "%USERPROFILE%\.dsh\profiles\desktop\node_modules\d
 ## 常用命令
 
 ```powershell
-npm test          # 168 项测试（含 plugin/tests）
+npm test          # 208 项测试（含 plugin/tests）
 npm run selfcheck # 27 项结构与安全自检；失败会写日志并弹窗
 npm run probe:acp # 在隔离 DSH_HOME 起一次真实 ACP 回合（自建自清，不碰日常 profile）
 npm run probe:e2e # 全链路：鲸鲸请求形状 → 代理 → engine → 真实 DSH(ACP) → 回复
@@ -63,11 +72,11 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 ```
 
 > `npm` 需要 Node ≥22 在 PATH 里。没有的话用
-> `C:\Users\Administrator\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe` 直接跑对应脚本，或双击 `start-bridge.cmd`。
+> DSH 自带的 node：`<你的 DSH_HOME>\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe`，或双击 `start-bridge.cmd`。
 
 ## 能证明什么
 
-- `npm test`：**168 项**通过，0 失败。覆盖身份校验、会话隔离、防重、**失败可重试且成功仍去重**、队列与并发上限、缓存淘汰、三种人格模式（原生不注入 / 注入 / 空设定不拼装）、**结构化人格拼装与预算**、**记忆三层与注入上限**、**ACP 握手与方法名**、**ACP 通知流组装**（思考不外泄、空回合计错、超时）、ACP 后端（人设只发首条、失败重试仍带人设、会话上限、工具白名单硬拒）、信封编解码、代理分流、**流式 SSE 输出符合鲸鲸解析规则**、**发送回执闭环**、鲸鲸插件算法与 wasm 逐字节一致、宿主校验规则兼容、**端到端影子运行**、设置页客户端加载与注册、自检接线、整链路组合、插件包规则（两种清单大小写）。
+- `npm test`：**208 项**通过，0 失败。覆盖身份校验、会话隔离、防重、**失败可重试且成功仍去重**、队列与并发上限、缓存淘汰、三种人格模式（原生不注入 / 注入 / 空设定不拼装）、**结构化人格拼装与预算**、**记忆三层与注入上限**、**ACP 握手与方法名**、**ACP 通知流组装**（思考不外泄、空回合计错、超时）、ACP 后端（人设只发首条、失败重试仍带人设、会话上限、工具白名单硬拒）、信封编解码、代理分流、**流式 SSE 输出符合鲸鲸解析规则**、**发送回执闭环**、鲸鲸插件算法与 wasm 逐字节一致、宿主校验规则兼容、**端到端影子运行**、设置页客户端加载与注册、自检接线、整链路组合、插件包规则（两种清单大小写）。
 - `npm run probe:acp`：隔离 `DSH_HOME` 里起真实 DSH（`--profile acp`），完成握手、建会话、一个回合、取回正文。用本地桩模型，零凭据、零外网。
 - `npm run probe:e2e`：把鲸鲸的真实请求形状（`stream:true` + 信封 system）打进代理，一路走到隔离 DSH 再回来，按鲸鲸的解析规则还原出 22 字回复。
 - `npm run selfcheck`：**27 项**结构与环境自检全过，`mockOnly: true`；同一份代码也挂在设置页的「运行自检」按钮后面。
@@ -85,13 +94,11 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 `tests/selfcheck-alert.test.mjs` 6 项盯着这几条规则：通过不弹、失败必记、抛异常也留档、日志轮转、摘要只列失败项。
 - 备份：`../鲸鲸桥接备份/pre-development-20261113-145501-48bb6f90/backup-manifest.json`（37 文件，SHA-256 校验）。
 
-## 不能证明什么（别当成已完成）
+## 还没做到的（别当成已完成）
 
-1. **真实大模型的回复质量没验过。** 隔离宿主接的是本地桩模型；接真模型需要你决定用哪个 key。
-2. **鲸鲸侧没改任何文件，也没试装。** 没有真实微信消息流经过本桥。
-3. **设置页没在真实 DSH 里加载过。** 只证明了 bundle 可加载、注册契约与两个已工作插件逐字一致。
-4. **人格层的自动成长没做。** 自定义人格目前靠手写，不会自己变长。
-5. **语料学习不是训练。** 只做统计（句长/标点/表情比例），不注入他人原句，也做不到真正"学会说话"。
+1. **人格不会自己成长。** 自定义人格靠手写，桥接不会让它变长。
+2. **语料学习不是训练。** 只做统计（句长/标点/表情比例），不注入他人原句，做不到真正「学会说话」。
+3. **群聊不支持。** 只处理文字私聊；群聊消息一律拒收，鲸鲸会回退到它自己的模型。
 
 ## 链路
 
@@ -118,6 +125,8 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 | `src/proxy.mjs` | 本地 OpenAI 兼容端点，分流信封 / 透传 |
 | `src/envelope.mjs` | 信封编解码与回执判定 |
 | `src/persona.mjs` | 结构化人格 → 注入文本（含预算与整块取舍） |
+| `src/persona-profile.mjs` | 把日常 profile 的插件配置复刻到隔离宿主（人格跟随） |
+| `src/settings-store.mjs` | 设置落盘（JSON，无 BOM，原子替换） |
 | `src/memory.mjs` | 三层记忆、按需检索、注入硬上限 |
 | `src/isolation.mjs` | 拒绝日常 DSH_HOME，剥离子进程凭据 |
 | `src/adapters/acp.mjs` | ACP 客户端（握手、通知流、权限拒绝） |
@@ -134,11 +143,13 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 
 | 模式 | 桥接做什么 | 前提 |
 |---|---|---|
-| 跟随 DSH | **什么都不注入**，连她的文件都不读 | 无 |
+| 跟随 DSH | 把日常 profile 的插件配置整体复刻到隔离宿主，人格由隔离 DSH 自己装配 | 无 |
 | 跟随鲸鲸 | 把她请求里的 system 作首条背景 | 隔离宿主不挂 DSH 人设 |
 | 自定义 | 用结构化字段拼出的文本 | 同上 |
 
-「跟随 DSH」是唯一不打架的模式——因为它是让路，不是叠加。ACP 的 `session/new` 没有 system 参数，人设无法作为系统消息安装。
+「跟随 DSH」不是「把人格文本塞进去」，而是复刻配置让它自己长出来。所以无论你用哪个插件养人格都能跟随，桥接里没有任何人格插件白名单。
+
+`session/new` 确实没有 system 参数——桥接不碰它，走的是配置同步这条路。
 
 ## 人格设定的成本模型（决定所有上限）
 
@@ -195,7 +206,7 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 
 鲸鲸扫描 `<dataDir>/plugins` 里的 `<id>.flow.json`，并配一个 `<id>.flow-grant.json`（`messagePlugins.js:121-136`）。授权 hash 是 `sha256(JSON.stringify(flow))`，改一个字就失效。**整个 `src` 里没有 ZIP 安装器**，`data/plugins` 现在是空的。
 
-所以真正的交付物是 `npm run make:flow` 生成的两个 JSON 文件，目标目录 `I:\Whale-Girl\WhaleGirl\data\plugins\`。两个 ZIP 保留作市场分发参考，但运行时不吃它们。
+所以真正的交付物是 `npm run make:flow` 生成的两个 JSON 文件，目标目录 `<鲸鲸数据目录>/plugins/`。两个 ZIP 保留作市场分发参考，但运行时不吃它们。
 
 1. **主聊天链路是流式的。** `src/pipeline/chat.js:1575` 走 `for await (const piece of this.llm.stream(...))`，所以代理必须回 `text/event-stream`。测试里直接复刻了她的 `parseSseLines` 与 `pickText`，并确保**不混入任何 reasoning 字段**。
 2. **鉴权头是 `Authorization: Bearer <apiKey>`**，apiKey 为空时**根本不发**这个头。所以配置时 key 必须填桥接令牌。
@@ -210,16 +221,17 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 2. **`session/prompt` 不返回助手文本**，只返回 `{ stopReason }`。正文由 `session/update` 通知逐块送来，只拼接 `agent_message_chunk`。
 3. **`session/new` 只接受 `{ cwd, mcpServers }`**，没有人设参数。人设只能作首条消息的背景。
 
-### 实测踩到的三个坑
+### 实测踩到的四个坑
 
 1. **CLI 入口在 `app.asar` 内**，`fs.existsSync` 判断为不存在。只能通过 `dsh.cmd` 启动。
 2. **`--profile acp` 是内置模板**，不在 `$DSH_HOME/profiles` 里；首次启动自动创建。
-3. **ACP 会话用的模型配置在 `acp` 条目**（`provider` / `model`），不在 `agent-default-model`。改错地方会一直报「no API key for provider route "deepseek-official"」。
+3. **ACP 会话用的模型配置在 `id: acp` 条目**（`provider` / `model`），不在 `agent-default-model`。改错地方会一直报「no API key for provider route "deepseek-official"」。
+4. **`dsh-agent-md` 依赖 `webServer` 服务**，纯 ACP 宿主不提供该服务，它永远停在 pending。人格跟随不能靠它单独撑。
 
 ## 三条硬边界
 
 1. 不连接 `http://127.0.0.1:<当前端口>`，不复用日常 DSH 的 storage。
-2. 测试宿主必须在独立目录内新建 `DSH_HOME`；`assertIsolatedHome` 拒绝 `C:\Users\Administrator\.dsh` 与 `I:\DSH-Data\dsh`。
+2. 测试宿主必须在独立目录内新建 `DSH_HOME`；`assertIsolatedHome` 拒绝日常 DSH 的 HOME。
 3. 外部聊天进入的处理上下文，工具白名单恒为 `[]`，权限请求一律 `reject`。
 
 ## 信封的安全性
@@ -236,15 +248,15 @@ npm start         # 启动桥接（mock 后端），会打印地址和令牌
 ## 已知的接口缺口
 
 1. 鲸鲸 `buildPayload` 不带 chatId/senderId（`src/llm/client.js` 547–598），所以需要插件写信封。
-2. `chat.prompt` 的信封路径未在真实鲸鲸上验证，她可能拒绝申请 `model.prompt` 的插件。
-3. 后台/记忆提取请求不带标记 → 只能透传或明确拒绝。
-4. `chat.dispatched` 的 `delivery` 形状是假设，未观测。
-5. `state.seq` 重启归零 → `messageId` 复用会退化成陈旧回答。
-6. ACP 没有 system prompt / 人设通道。
-7. proxy 必须支持 SSE，否则主聊天链路不通。
+2. 后台/记忆提取请求不带标记 → 只能透传或明确拒绝。
+3. `chat.dispatched` 的 `delivery` 形状是假设，未观测。
+4. `state.seq` 重启归零 → `messageId` 复用会退化成陈旧回答。
+5. proxy 必须支持 SSE，否则主聊天链路不通。
+6. 鲸鲸侧收到非 200 只会回固定话术，桥接的真实错误码传不到用户面前。
 
 ## 下一步
 
-1. 鲸鲸本地试装（只动鲸鲸，可回退），验清单键名与信封到达。
-2. 给隔离宿主接一个真 key，验真实大模型回复质量。
-3. 挂进日常 DSH 前先跑 `E:\桌面\DSH回档\`。
+1. 在别的机器上验证「跟随 DSH」，确认不依赖具体人格插件。
+2. 群聊支持（当前明确不支持，只回退）。
+3. 鲸鲸侧插件暴露桥接的真实错误码，替换现在固定的话术。
+4. `enabled` 开关目前存在两份（`config.json` 与 `service.json`），该合并成一个。
