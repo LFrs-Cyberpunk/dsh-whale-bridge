@@ -1,0 +1,15 @@
+# 构建依赖不入库；dist 是交付物，保留
+whale-plugin/build/node_modules/
+whale-plugin/build/pnpm-lock.yaml
+*.log
+.test-home/
+
+# 本机运行期产物，不属于插件源码
+.maintenance/
+logs/
+node_modules/
+*.tmp-*
+.tmp/
+
+# 打包中间产物
+*.zip

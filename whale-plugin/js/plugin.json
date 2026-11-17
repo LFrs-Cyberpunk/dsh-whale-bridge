@@ -1,0 +1,14 @@
+{
+  "Id": "whale-dsh-bridge",
+  "Name": "DSH 桥接",
+  "Author": "local",
+  "Version": "1.0.0",
+  "MinAppVersion": "4.1.2",
+  "Description": "把消息转给本机 DSH，用 DSH 的回复代替鲸鲸自己的模型。chat.prompt 只用来捕获她的人格提示词转交给 DSH（不改写她的提示词）；失败时自动退回鲸鲸原本的回复方式。",
+  "ResultLabel": "回复",
+  "Api": 4,
+  "Kind": "message",
+  "Hooks": ["chat.prompt", "chat.generate"],
+  "Permissions": ["system.full"],
+  "ExecutionTimeoutMs": 60000
+}

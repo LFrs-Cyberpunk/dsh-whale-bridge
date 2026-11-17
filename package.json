@@ -1,0 +1,61 @@
+{
+  "name": "dsh-whale-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "plugin/apply.mjs",
+  "exports": {
+    ".": "./plugin/apply.mjs",
+    "./client": "./plugin/client.js",
+    "./cordis.patch.yml": "./plugin/cordis.patch.yml",
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
+  "description": "隔离开发的鲸鲸—DSH消息桥；不自动挂载日常DSH",
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./plugin/cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 --test-timeout=20000 tests/*.test.mjs plugin/tests/*.test.mjs",
+    "selfcheck": "node scripts/selfcheck.mjs",
+    "verify": "node scripts/verify-plugin-package.mjs whale-plugin/dist/whale-dsh-router-0.1.0.zip",
+    "probe:acp": "node scripts/probe-acp.mjs",
+    "probe:e2e": "node scripts/probe-e2e.mjs",
+    "grow": "node scripts/grow-persona.mjs",
+    "make:flow": "node scripts/make-flow-plugin.mjs",
+    "install:whale": "node scripts/install-whale-plugin.mjs",
+    "pack:js": "node scripts/pack-js-plugin.mjs",
+    "start": "node scripts/wire-host.mjs"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "wechat",
+    "wechatauto",
+    "bridge",
+    "acp",
+    "persona"
+  ],
+  "files": [
+    "client.js",
+    "plugin",
+    "src",
+    "scripts",
+    "docs",
+    "README.md",
+    "SAFETY.md"
+  ]
+}

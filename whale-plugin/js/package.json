@@ -1,0 +1,4 @@
+{
+  "type": "commonjs",
+  "//": "本地开发用。鲸鲸按 CommonJS 加载 plugin.js，而项目根 package.json 是 module，所以这里必须声明 commonjs，否则 Node 会把 plugin.js 当 ESM 解析、exports 失效。打包 ZIP 时不要包含本文件。"
+}

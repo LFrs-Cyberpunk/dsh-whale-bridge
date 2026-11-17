@@ -1,0 +1,11 @@
+# dsh-whale-bridge bundle patch
+#
+# Registers the host half (settings routes + bridge supervisor) with the DSH tree.
+# `name` MUST be the real package name — cordis imports by name, so a typo here
+# makes a fresh install fail with "Cannot find package".
+#
+# Pure insert(id/name) is hot-mountable; the client half is declared separately in
+# package.json under dsh.client.
+- insert:
+    - id: whale-bridge-settings
+      name: dsh-whale-bridge

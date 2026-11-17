@@ -1,0 +1,21 @@
+{
+  "name": "dsh-whale-bridge",
+  "version": "0.1.0-dev.1",
+  "private": true,
+  "type": "module",
+  "description": "鲸鲸—DSH 桥接的设置分区（隔离开发草稿，未挂载）",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": ["index.js", "client.js", "README.md"],
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": ["@deepseek-ai/dsh-client-ui-settings", "@deepseek-ai/dsh-client-ui-slots"]
+    }
+  },
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,36 @@
+# Patch layer for the ISOLATED acp profile used by scripts/probe-acp.mjs.
+# It is copied into <isolated DSH_HOME>/profiles/acp/cordis.patch.yml and is
+# NEVER written to the daily DSH profile.
+#
+# Why: the stock acp profile routes to deepseek-official and needs a real API key.
+# For transport verification we point it at a local stub on 127.0.0.1 instead, so
+# no credentials are involved and no external call is made.
+#
+# The model actually used by an ACP session is configured on the `acp` entry
+# (provider/model), NOT on agent-default-model — that one only sets the default
+# for ordinary agent sessions. Overriding the wrong entry is why the first probe
+# runs still asked for a DeepSeek API key.
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      local-fake:
+        displayName: 本地假模型（仅测试）
+        apiKeyEnv: LOCAL_FAKE_KEY
+        api: openai-completions
+        baseURL: http://127.0.0.1:18080/v1
+        models:
+          - id: fake-1
+            name: fake-1
+            input:
+              - text
+- id: acp
+  name: "@deepseek-ai/dsh-acp"
+  config:
+    provider: local-fake
+    model: fake-1
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: local-fake
+    model: fake-1
